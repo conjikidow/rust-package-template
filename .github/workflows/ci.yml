@@ -100,7 +100,7 @@ jobs:
           toolchain: stable
 
       - name: Run cargo check
-        run: cargo check --workspace --all-targets --all-features
+        run: cargo check --all-targets --all-features
 
   lint-rust:
     name: Lint Rust
@@ -123,7 +123,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run Clippy
-        run: cargo clippy --workspace --all-targets --all-features
+        run: cargo clippy --all-targets --all-features
 
   test-rust:
     name: Test Rust
@@ -143,7 +143,7 @@ jobs:
           toolchain: stable
 
       - name: Run tests
-        run: cargo test --workspace --all-features
+        run: cargo test --all-features
 
   check-typos:
     name: Check typos
