@@ -1,6 +1,6 @@
-# rust-workspace-template
+# rust-package-template
 
-This is a template repository for Rust workspace.
+This is a template repository for a Rust package.
 
 ## GitHub Actions Permissions Setup
 
@@ -19,41 +19,41 @@ Follow these steps to configure the permissions:
 
 These settings are **necessary only for private repositories**. For public repositories, this configuration is not required.
 
-## Workspace Setup
+## Package Setup
 
-Update your workspace metadata in `Cargo.toml`:
+Update your package metadata in `Cargo.toml`:
 
 ```toml
-[workspace.package]
+[package]
+name = "your-package-name"  # Replace with your package name
 version = "0.1.0"
 edition = "2024"
 readme = "README.md"
 license = "Apache-2.0 OR MIT"  # Replace with your license
-repository = "https://github.com/conjikidow/repo"  # Replace with your repository URL
+repository = "https://github.com/<owner>/<repo>"  # Replace with your repository URL
+authors = ["Your Name"]  # Replace with your name
 ```
 
 This template repository includes [`LICENSE-APACHE`](LICENSE-APACHE) and [`LICENSE-MIT`](LICENSE-MIT) by default.
 They are provided as a template and may be modified, replaced, or removed as needed.
 
-Add packages to the workspace by:
+A Rust package can contain multiple crates:
 
-```bash
-cargo new --vcs none crates/<package-name>
-```
-
-By default this template is binary-first; add `--lib` if you need a library crate.
+- `src/main.rs` for the default binary crate
+- `src/lib.rs` for an optional library crate (at most one per package)
+- `src/bin/*.rs` for additional binary crates
 
 ## Release Management Setup
 
 ### Overview
 
 This template uses [release-plz](https://release-plz.dev) to automate releases based on Conventional Commits.
-It opens a release PR and, once merged, publishes the crate and (optionally) creates a GitHub Release.
+It opens a release PR and, once merged, publishes the crate to crates.io and (optionally) creates a GitHub Release.
 
-Rust workspaces can be either:
+A Rust package can be either:
 
-- **Binary workspace** (default here): includes at least one binary crate. Publishing binaries is done with [dist](https://axodotdev.github.io/cargo-dist/book), which builds per-platform binaries and uploads them to GitHub Releases.
-- **Library-only workspace**: no binaries. In this case, remove the `dist` configuration and let `release-plz` handle releases only.
+- **Binary package** (default): includes at least one binary crate. Publishing binaries is done with [dist](https://axodotdev.github.io/cargo-dist/book), which builds per-platform binaries and uploads them to GitHub Releases.
+- **Library-only package**: no binaries. In this case, remove the `dist` configuration and let `release-plz` handle releases only.
 
 ### GitHub App Setup (recommended)
 
@@ -87,7 +87,7 @@ Store the credentials as GitHub Actions secrets:
 You can find the secrets page at:
 `https://github.com/<owner>/<repo>/settings/secrets/actions`
 
-### Setup for Binary Workspace (uses dist)
+### Setup for Binary Package (uses dist)
 
 1. Ensure `.release-plz.toml` has `release = true` under `[workspace]` (this template sets it to `false` by default).
 2. `dist` is already configured via `dist-workspace.toml`.
@@ -98,7 +98,7 @@ You can find the secrets page at:
    dist init
    ```
 
-### Setup for Library-only Workspace
+### Setup for Library-only Package
 
 1. Ensure `.release-plz.toml` has `release = true` under `[workspace]` (this template sets it to `false` by default).
 2. Remove `dist-workspace.toml`, `.github/workflows/release.yml`, and `.github/workflows/dist-generate.yml`.

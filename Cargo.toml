@@ -1,16 +1,14 @@
-[workspace]
-members = ["crates/*"]
-resolver = "3"
-
-[workspace.package]
+[package]
+name = "your-package-name"
+description = "A Rust package template"
 version = "0.1.0"
 edition = "2024"
 readme = "README.md"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/conjikidow/repo"
-authors = ["conjikidow"]
+repository = "https://github.com/<owner>/<repo>"
+authors = ["Your Name"]
 
-[workspace.dependencies]
+[dependencies]
 
 [profile.dist]
 inherits = "release"
