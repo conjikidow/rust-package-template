@@ -1,0 +1,187 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+
+  determine-changes:
+    name: Determine changed files
+    runs-on: ubuntu-latest
+    outputs:
+      doc: ${{ steps.changed-files.outputs.doc_any_changed }}
+      workflow: ${{ steps.changed-files.outputs.workflow_any_changed }}
+      workflow_ci: ${{ steps.changed-files.outputs.workflow_ci_any_changed }}
+      rust: ${{ steps.changed-files.outputs.rust_any_changed }}
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Determine changed files
+        uses: tj-actions/changed-files@e0021407031f5be11a464abee9a0776171c79891 # v47.0.1
+        id: changed-files
+        with:
+          files_yaml: |
+            doc:
+              - '**/*.md'
+              - '**/docs/**'
+            workflow:
+              - .github/workflows/**
+            workflow_ci:
+              - .github/workflows/ci.yml
+            rust:
+              - '**/*.rs'
+              - '**/Cargo.toml'
+              - 'Cargo.lock'
+
+  lint-gh-actions:
+    name: Lint GitHub Actions
+    needs: determine-changes
+    if: ${{ needs.determine-changes.outputs.workflow == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      security-events: write
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - uses: reviewdog/action-actionlint@83e4ed25b168066ad8f62f5afbb29ebd8641d982 # v1.69.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          fail_level: error
+
+      - name: List workflows for zizmor
+        id: list-workflows
+        run: |
+          {
+            echo "inputs<<EOF"
+            find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) \
+              ! -name 'release.yml'
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@e639db99335bc9038abc0e066dfcd72e23d26fb4 # v0.3.0
+        with:
+          inputs: ${{ steps.list-workflows.outputs.inputs }}
+          # advanced-security: false  # must be false for private repo
+
+  build-rust:
+    name: Check Rust build
+    needs: determine-changes
+    if: ${{ needs.determine-changes.outputs.rust == 'true' || needs.determine-changes.outputs.workflow_ci == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c # v1.15.2
+        with:
+          toolchain: stable
+
+      - name: Run cargo check
+        run: cargo check --workspace --all-targets --all-features
+
+  lint-rust:
+    name: Lint Rust
+    needs: determine-changes
+    if: ${{ needs.determine-changes.outputs.rust == 'true' || needs.determine-changes.outputs.workflow_ci == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c # v1.15.2
+        with:
+          toolchain: stable
+
+      - name: Run Rustfmt check
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --all-features
+
+  test-rust:
+    name: Test Rust
+    needs: determine-changes
+    if: ${{ needs.determine-changes.outputs.rust == 'true' || needs.determine-changes.outputs.workflow_ci == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c # v1.15.2
+        with:
+          toolchain: stable
+
+      - name: Run tests
+        run: cargo test --workspace --all-features
+
+  check-typos:
+    name: Check typos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check spelling
+        uses: crate-ci/typos@bb4666ad77b539a6b4ce4eda7ebb6de553704021 # v1.42.0
+        with:
+          files: |
+            .
+            .github/**
+
+  lint-commit-messages:
+    name: Lint commit messages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Commitizen
+        uses: commitizen-tools/setup-cz@d9dea553c82d773957ef71a6ca2be84e3c175bf5 # v0.6.0
+        with:
+          python-version: '3.x'
+
+      - name: Lint commit messages on push
+        if: github.event_name == 'push'
+        run: cz check --rev-range ${{ github.event.before }}..${{ github.sha }}
+
+      - name: Lint commit messages on pull request
+        if: github.event_name == 'pull_request'
+        run: cz check --rev-range ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
