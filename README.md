@@ -1,5 +1,7 @@
 # rust-package-template
 
+[![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)](https://github.com/j178/prek)
+
 This is a template repository for a Rust package.
 
 ## GitHub Actions Permissions Setup
