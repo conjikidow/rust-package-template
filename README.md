@@ -6,7 +6,9 @@ This is a template repository for a Rust package.
 
 ## GitHub Actions Permissions Setup
 
-To enable GitHub Actions to run properly in your repository, you need to adjust the default permissions granted to the `GITHUB_TOKEN`. This is especially important for **private repositories**.
+To enable GitHub Actions to run properly in your repository, you need to adjust the default permissions granted
+to the `GITHUB_TOKEN`.
+This is especially important for **private repositories**.
 
 Follow these steps to configure the permissions:
 
@@ -54,8 +56,11 @@ It opens a release PR and, once merged, publishes the crate to crates.io and (op
 
 A Rust package can be either:
 
-- **Binary package** (default): includes at least one binary crate. Publishing binaries is done with [dist](https://axodotdev.github.io/cargo-dist/book), which builds per-platform binaries and uploads them to GitHub Releases.
-- **Library-only package**: no binaries. In this case, remove the `dist` configuration and let `release-plz` handle releases only.
+- **Binary package** (default): includes at least one binary crate.
+  Publishing binaries is done with [dist](https://axodotdev.github.io/cargo-dist/book),
+  which builds per-platform binaries and uploads them to GitHub Releases.
+- **Library-only package**: no binaries. In this case, remove the `dist`
+  configuration and let `release-plz` handle releases only.
 
 ### GitHub App Setup (recommended)
 
@@ -140,10 +145,12 @@ uvx pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-type
 
 ## Commit Message Linting with Commitizen
 
-This template repository enforces [Conventional Commits](https://www.conventionalcommits.org) in pre-commit hooks and CI, so your commit messages must follow that format.
+This template repository enforces [Conventional Commits](https://www.conventionalcommits.org) in pre-commit hooks and CI,
+so your commit messages must follow that format.
 
 You can maintain Conventional Commits manually, but automation tools such as Commitizen or git-cz can help.
-Any tool is fine, but this repository uses [commitizen-tools/commitizen](https://github.com/commitizen-tools/commitizen) for checks, so it is recommended.
+Any tool is fine, but this repository uses [commitizen-tools/commitizen](https://github.com/commitizen-tools/commitizen)
+for checks, so it is recommended.
 
 Install Commitizen:
 
@@ -163,4 +170,6 @@ For more details, see [Commitizen documentation](https://commitizen-tools.github
 
 Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this software by you, as defined in the Apache-2.0 license, shall be dually licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this software
+by you, as defined in the Apache-2.0 license, shall be dually licensed as above,
+without any additional terms or conditions.
