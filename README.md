@@ -30,6 +30,7 @@ Update your package metadata in `Cargo.toml`:
 ```toml
 [package]
 name = "your-package-name"  # Replace with your package name
+description = "A Rust package template"
 version = "0.1.0"
 edition = "2024"
 readme = "README.md"
