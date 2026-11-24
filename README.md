@@ -17,10 +17,16 @@ description = "A Rust package template"
 readme = "README.md"
 repository = "https://github.com/<owner>/<repo>"  # Replace with your repository URL
 license = "Apache-2.0 OR MIT"  # Replace with your license
+include = ["/CHANGELOG.md", "/LICENSE*", "/README.md", "/src"]
 ```
 
 This template repository includes [`LICENSE-APACHE`](LICENSE-APACHE) and [`LICENSE-MIT`](LICENSE-MIT) by default.
 They are provided as a template and may be modified, replaced, or removed as needed.
+
+`include` limits the package published to crates.io to the sources, the README, the changelog, and the licenses.
+Add any other file the package needs to build, such as `build.rs`, to `include`.
+release-plz counts only commits that change the files published to crates.io,
+so changing only `dist-workspace.toml` opens no release pull request.
 
 A Rust package can contain multiple crates:
 
